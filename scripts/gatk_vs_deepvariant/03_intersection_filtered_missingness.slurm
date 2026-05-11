@@ -20,7 +20,7 @@ bcftools view -m2 -M2 -v snps SNPs_only.recode.vcf.gz -Oz -o classmate.biallelic
 echo "Filtering by missingness..."
 
 bcftools view \
--e 'F_MISSING < 0.2' \
+-e 'F_MISSING > 0.375' \
 -Oz \
 -o classmate.final_snps.vcf.gz \
 classmate.biallelic.vcf.gz
@@ -31,7 +31,7 @@ bcftools index -t classmate.final_snps.vcf.gz
 # Missingness filtering of GATK dataset
 echo "Filtering by missingness..."
 bcftools view \
--e 'F_MISSING < 0.2' \
+-e 'F_MISSING > 0.375' \
 -Oz \
 -o final_snps.vcf.gz \
 /mnt/tank/scratch/ebarabanova/vcf_filtering_qc/filtered_vcfs/geno20Filtered_biallelic.vcf.gz
