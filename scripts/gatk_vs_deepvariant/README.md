@@ -1,67 +1,24 @@
-# GATK vs DeepVariant VCF Comparison Pipeline
+GATK vs DeepVariant VCF Comparison Pipeline
 
-This module contains scripts for comparative analysis of variant call sets generated using two different variant callers:
-- GATK (Genome Analysis Toolkit)
-- DeepVariant
+This module contains scripts for comparative analysis of variant call sets generated using two independent variant calling pipelines:
+* Genome Analysis Toolkit (GATK)
+* DeepVariant
+The goal of this workflow is to evaluate concordance between pipelines and quantify shared and caller-specific variants before and after filtering.
 
-The goal is to assess concordance between the two pipelines and quantify shared and caller-specific variants after standardized filtering.
+Workflow Overview
 
----
+The comparison is performed using bcftools isec and includes:
+1. Raw VCF intersection Baseline concordance prior to any filtering.
+2. Filtered VCF intersection Datasets after site-level and genotype-level filtering, SNPs only, biallelic subsets.
+3. Intersection after missingness filtering Sites with high proportions of missing genotypes (e.g., F_MISSING > 0.375) removed.
+  4. Intersection of the GATK-generated VCF with adjusted filtering parameters versus DeepVariant filtered VCF
+       The final comparison uses the optimized GATK dataset selected for downstream population genetic analyses.
 
-## 🧬 Overview of the pipeline
-
-The analysis follows a reproducible multi-step workflow:
-
-### 1. VCF normalization
-- Left-aligns indels and splits multiallelic sites
-- Ensures consistent variant representation across datasets
-- Tool: `bcftools norm`
-
-### 2. SNP and biallelic filtering
-- Retains only SNP variants
-- Restricts to biallelic sites (removes complex alleles)
-
-### 3. Missingness filtering
-- Removes variants with high proportions of missing genotypes
-- Threshold: `--max-missing 0.8` (VCFtools)
-
-### 4. Intersection analysis
-- Performed using `bcftools isec`
-- Identifies:
-  - Shared variants between datasets
-  - GATK-private variants
-  - DeepVariant-private variants
-
-### 5. Summary statistics
-Computed metrics include:
-- Total variant counts
-- Shared and private variant counts
-- Jaccard similarity index
-- Proportions of shared/private variants
-- Transition/transversion (Ts/Tv) ratios
-
----
-
-## 📊 Outputs
-
-The pipeline generates:
-
-- `isec_output/`
-  - `0000.vcf` → variants unique to GATK
-  - `0001.vcf` → variants unique to DeepVariant
-  - `0002.vcf` → shared variants
-
-- `stats_report.txt`
-  - Summary statistics of concordance analysis
-
----
-
-## ⚙️ Requirements
-
-- bcftools
-- vcftools
-- bgzip / tabix
-- conda environment: `vcf_clean`
-
-
-Generated as part of VCF QC and comparative analysis workflow.
+ Metrics Computed
+For each comparison stage, the scripts calculate:
+* Total variant counts
+* Shared variants
+* Private variants
+* Jaccard similarity index
+* Proportions of shared/private variants
+* Transition/transversion (Ts/Tv) ratios
