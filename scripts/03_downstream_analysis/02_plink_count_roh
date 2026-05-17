@@ -1,0 +1,37 @@
+#!/bin/bash
+#SBATCH --job-name=plink_roh_summary
+#SBATCH --output=plink_roh_%j.out
+#SBATCH --error=plink_roh_%j.err
+#SBATCH --time=01:00:00
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=8G
+
+set -euo pipefail
+
+source /nfs/home/ebarabanova/miniconda3_new/etc/profile.d/conda.sh
+conda activate vcf_clean
+
+WORKDIR=/mnt/tank/scratch/ebarabanova/roh
+mkdir -p "$WORKDIR"
+cd "$WORKDIR"
+
+VCF=/mnt/tank/scratch/ebarabanova/missingness_calculations/final_missingness_filtered.vcf.gz
+PREFIX=deer
+
+echo "Step 1: convert VCF to PLINK format..."
+plink \
+  --vcf "$VCF" \
+  --allow-extra-chr \
+  --make-bed \
+  --out "$PREFIX"
+
+echo "Step 2: run ROH detection..."
+plink \
+  --bfile "$PREFIX" \
+  --allow-extra-chr \
+  --homozyg \
+  --homozyg-window-snp 50 \
+  --homozyg-snp 50 \
+  --homozyg-kb 100 \
+  --homozyg-density 50 \
+  --out "${PREFIX}_roh"
