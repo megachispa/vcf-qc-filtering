@@ -1,0 +1,9 @@
+1. Extract sample names
+2. Extract variant + annotation + genotypes
+3. Build genotype matrix
+4. Build header
+5. Combine table
+6. Map gene IDs → gene names (clean extraction)
+DONE
+Output:
+ - high_impact_genotypes_named.tsv
